@@ -193,10 +193,18 @@ class ScriptBuilder
                 $release_path = $tokens['release_path'];
                 $shared_path  = $tokens['shared_path'];
                 $project_path = $tokens['project_path'];
-
+                
+                $dockerDeployment = false;
+                
+                $this->deployment->project->variables->each(function ($variable) use(&$dockerDeployment){
+                  if($variable->name == "DOCKER_DEPLOYMENT"){
+                    $dockerDeployment = true;
+                  }
+                });
+                $script = $dockerDeployment ? 'deploy.steps.InstallComposerDependenciesDocker' : 'deploy.steps.InstallComposerDependencies';
                 // Write configuration file to release dir, symlink shared files and run composer
                 return $this->process
-                            ->setScript('deploy.steps.InstallComposerDependencies', $tokens)
+                            ->setScript($script, $tokens)
                             ->prependScript($this->configurationFileCommands($release_path))
                             ->appendScript($this->shareFileCommands($release_path, $shared_path, $project_path));
             case Command::DO_ACTIVATE:
