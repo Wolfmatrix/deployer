@@ -16,10 +16,11 @@ if [[ $LINE_COUNT > 1 ]]; then
 fi
 
 cd {{ release_path }}
-docker-compose up -d 
+docker-compose up --no-start
 echo -e "\n"
 
 if [ $DOCKER_RUN_COMPOSER -ne 0 ]; then 
+    docker-compose up -d
     ID=$(docker-compose ps -q $DOCKER_SERVICE)
     echo "ID:$ID"
     docker exec -i  $ID sh <<TEST
